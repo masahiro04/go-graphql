@@ -11,23 +11,59 @@ import (
 )
 
 func (r *mutationResolver) CreateBook(ctx context.Context, input model.BookInput) (*model.Book, error) {
-	panic(fmt.Errorf("not implemented"))
+	book, err := r.BookRepository.CreateBook(&input)
+	bookCreate := &model.Book{
+		ID:        book.ID,
+		Title:     book.Title,
+		Author:    book.Author,
+		Publisher: book.Publisher,
+	}
+	if err != nil {
+		return nil, err
+	}
+	return bookCreate, nil
 }
 
 func (r *mutationResolver) DeleteBook(ctx context.Context, id int) (string, error) {
+	err := r.BookRepository.DeleteBook(id)
+	if err != nil {
+		return "", err
+
+	}
+	successMessage := "successfully deleted"
+	return successMessage, nil
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *mutationResolver) UpdateBook(ctx context.Context, id int) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *mutationResolver) UpdateBook(ctx context.Context, id int, input *model.BookInput) (string, error) {
+	err := r.BookRepository.UpdateBook(input, id)
+	if err != nil {
+		return "nil", err
+	}
+	successMessage := "successfully updated"
+	return successMessage, nil
 }
 
 func (r *queryResolver) GetAllBooks(ctx context.Context) ([]*model.Book, error) {
-	panic(fmt.Errorf("not implemented"))
+	books, err := r.BookRepository.GetAllBooks()
+	if err != nil {
+		return nil, err
+	}
+	return books, nil
 }
 
 func (r *queryResolver) GetOneBook(ctx context.Context, id int) (*model.Book, error) {
-	panic(fmt.Errorf("not implemented"))
+	book, err := r.BookRepository.GetOneBook(id)
+	selectedBook := &model.Book{
+		ID:        book.ID,
+		Title:     book.Title,
+		Author:    book.Author,
+		Publisher: book.Publisher,
+	}
+	if err != nil {
+		return nil, err
+	}
+	return selectedBook, err
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -38,16 +74,3 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented"))
-}
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented"))
-}
