@@ -1,0 +1,48 @@
+version: "3"
+services:
+  app:
+    container_name: app
+    volumes:
+      - ./:/app
+    tty: true
+    command: "air -c .air.toml"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+
+  db:
+    container_name: db
+    image: postgres:13.4
+    ports:
+      # portを15432とかに帰ればlocalとのバッティング避けられるのでは？
+      - '5432:5432'
+    environment:
+      POSTGRES_DB: api
+      POSTGRES_USER: postgresql
+      POSTGRES_PASSWORD: postgresql
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+      TZ: "Asia/Tokyo"
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  # test-db:
+  #   container_name: test-db
+  #   image: postgres:13.4
+  #   ports:
+  #     - '25432:5432'
+  #   environment:
+  #     POSTGRES_DB: test-api
+  #     POSTGRES_USER: postgresql
+  #     POSTGRES_PASSWORD: postgresql
+  #     POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+  #     TZ: "Asia/Tokyo"
+
+volumes:
+  db:
+    driver: local
+  log:
+  tmp:
